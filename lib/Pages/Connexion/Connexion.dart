@@ -1189,10 +1189,7 @@ class _ConnexionState extends State<Connexion> {
                   contentPadding: const EdgeInsets.only(top: 10, bottom: 0),
                   suffixIcon: IconButton(
                     onPressed: () async {
-                      // prefs = await SharedPreferences.getInstance();
-                      // if(prefs.getString("msisdnCache")!=null&&prefs.getString("msisdnCache").toString().isNotEmpty&&prefs.getString("pinCache")!=null&&prefs.getString("pinCache")!=null.toString().isNotEmpty) {
-                      //   authenticateWithBiometrics(context,prefs.getString("msisdnCache"),prefs.getString("pinCache"));
-                      // }
+
                     },
                     icon: Icon(Icons.person, color: Colors.grey[800], size: 25),
                   ),
@@ -1442,6 +1439,24 @@ class _ConnexionState extends State<Connexion> {
 
           if (jsonResponse["status"] == 200) {
             dataResponse = jsonResponse["data"];
+
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+
+            // sauvegarde utilisateur
+            await prefs.setString(
+              "userData",
+              jsonEncode(dataResponse),
+            );
+            // Sauvegarde après validation
+
+            await prefs.setString(
+              "msisdnCache",
+              telephoneController.text.trim(),
+            );
+            await prefs.setString("pinCache", passwordController.text.trim());
+            telephoneController.text = " ";
+            passwordController.text = "";
+
             print("les info du client");
             print(dataResponse["id"]);
             ApiService().getListeArticle();
@@ -1453,15 +1468,7 @@ class _ConnexionState extends State<Connexion> {
               if (Navigator.canPop(context)) {
                 Navigator.of(context).pop(); // Fermer le dialogue
               }
-              // Sauvegarde après validation
-              SharedPreferences prefs = await SharedPreferences.getInstance();
-              await prefs.setString(
-                "msisdnCache",
-                telephoneController.text.trim(),
-              );
-              await prefs.setString("pinCache", passwordController.text.trim());
-              telephoneController.text = " ";
-              passwordController.text = "";
+
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => Dashboard()),
               );

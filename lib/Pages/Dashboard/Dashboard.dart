@@ -16,6 +16,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
+import '../Accueil.dart';
 import '../Assistance.dart';
 import '../Decor/Decor.dart';
 import '../HELPER/PiedPageIcone.dart';
@@ -34,7 +35,8 @@ class Dashboard extends StatefulWidget {
   @override
   _DashboardState createState() => _DashboardState();
 }
-
+bool isLoggedIn = dataResponse != null &&
+    dataResponse['vcMsisdn'] != null;
 class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, RouteAware {
 
   late VideoPlayerController _controller;
@@ -127,7 +129,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
 
 
   void initState() {
-    print("'johnclassic${dataResponse['vcMsisdn']}'");
+    isLoggedIn = dataResponse != null &&
+        dataResponse['vcMsisdn'] != null;
+    ApiService().getListeArticle();
+    ApiService().getListeCommande();
+    ApiService().getListeModePaiement();
+    ApiService().getListePublicite();
+
     Pushy.listen();
     // Register the user for push notifications
     pushyRegister();
@@ -137,11 +145,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
     Pushy.setNotificationListener(backgroundNotificationListener);
     // Listen for notification click
     Pushy.setNotificationClickListener((Map<String, dynamic> data) {
-      // Print notification payload data
-      print('Notification click: $data');
+
       String text = data['message'];
-      print("ici l'affichage des messages issus du push");
-      print(text+' JOHN CLASSIC');
 
       if(data['appname']!=null&&data['appname'].toString().toLowerCase()=='JohnClassic'.toLowerCase()&&data['urlencode']!=null&&data['urlencode'].toString()=="1") {
         // Attempt to extract the "message" property from the payload: {"message":"Hello World!"}
@@ -186,7 +191,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
         }
       });
     });
-
 
     ApiService().getListeArticle();
     ApiService().getListeModePaiement();
@@ -296,7 +300,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                     children: [
                       UserAccountsDrawerHeader(
                         accountName: Text(
-                          "${dataResponse['vcPrenom']} ${dataResponse['vcNom']}",
+                          isLoggedIn
+                              ? "${dataResponse['vcPrenom']} ${dataResponse['vcNom']}"
+                              : "Visiteur",
                           style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -304,7 +310,9 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                           ),
                         ),
                         accountEmail: Text(
-                          dataResponse['vcMsisdn'].toString(),
+                          isLoggedIn
+                              ? dataResponse['vcMsisdn'].toString()
+                              : "Navigation sans compte",
                           style: const TextStyle(
                             fontSize: 14,
                             color: Colors.white70,
@@ -377,6 +385,8 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                         },
                       ),
                       const Divider(color: Colors.white24, indent: 16, endIndent: 16),
+                      isLoggedIn
+                          ?
                       ListTile(
                         leading: const Icon(Icons.person, color: Colors.white),
                         title: const Text(
@@ -388,8 +398,23 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                             MaterialPageRoute(builder: (context) => MonProfil()),
                           );
                         },
-                      ),
+                      ):
+                      ListTile(
+                        leading: const Icon(Icons.person, color: Colors.white),
+                        title: const Text(
+                          'Se connecter',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(builder: (context) => Connexion()),
+                          );
+                        },
+                      )
+                      ,
                       const Divider(color: Colors.white24, indent: 16, endIndent: 16),
+                      isLoggedIn
+                          ?
                       ListTile(
                         leading: const Icon(Icons.login, color: Colors.redAccent),
                         title: const Text(
@@ -397,7 +422,11 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                           style: TextStyle(color: Colors.redAccent,fontWeight: FontWeight.bold),
                         ),
                         onTap: () => showAlertDialogDeconnexion(context),
-                      ),
+                      )
+                          :
+                      const SizedBox(height:0)
+
+                      ,
                     ],
                   ),
                 ),
@@ -478,10 +507,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                         setState(() {
                           selectedService = newValue;
                           if(selectedService=="Boutique"){
-                            logn(context,chemin: 1);
+                            openService(context,chemin: 1);
                           }
                           else if(selectedService=="Décoration"){
-                            logn(context,chemin: 2);
+                            openService(context,chemin: 2);
                           }
                           else if(selectedService=="Immobilier"|| selectedService=="Coiffure"){
 
@@ -677,7 +706,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                   InkWell(
                     onTap: (){
 
-                      logn(context,chemin: 1);
+                      openService(context,chemin: 1);
 
                     },
                     child: Text("voir plus .... 👉🏼 ",
@@ -734,9 +763,6 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                               dataIdCouleurAndCouleur = article["couleurs"];
                               dataidTailleAndTaille = article["tailles"];
                               idProduitPanier = int.parse(article["id"].toString());
-                              print("idProduitPanier");
-                              print(idProduitPanier.runtimeType);
-
                               prixPromoArticle = calculerPrixAvecPromo(
                                 article["prix"].toString(),
                                 article["promo"].toString(),
@@ -882,10 +908,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
               onTap:(){
                 if(chemin==1){
 
-                  logn(context,chemin: chemin);
+                  openService(context,chemin: chemin);
                 }
                 else if(chemin==2){
-                  logn(context,chemin: chemin);
+                  openService(context,chemin: chemin);
                 }
                 else if(chemin==3|| chemin==4){
                   print("je rentre bien 5555");
@@ -987,7 +1013,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
     }
   }
 
-  logn(BuildContext context,{required chemin}){
+  openService(BuildContext context,{required chemin}){
     _showLoader();
 
     ApiService().getListeArticle();
@@ -1044,30 +1070,22 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
       ),
       onPressed: () async {
         Navigator.of(context).pop(); // Close dialog first
+        SharedPreferences prefs =
+        await SharedPreferences.getInstance();
 
+        await prefs.remove("userData");
         EasyLoading.instance
           ..dismissOnTap = true
           ..userInteractions = false;
         EasyLoading.show(status: 'Déconnexion en cours...');
 
         try {
-          // Sauvegarde temporaire des données sensibles
-          // await prefs.setString("msisdnCache", prefs.getString('msisdn') ?? '');
-          // await prefs.setString("pinCache", prefs.getString('pin') ?? '');
-          // await prefs.setString("idCache", prefs.getString('id') ?? '');
-
-          // // Suppression des données de session
-          // await prefs.remove('msisdn');
-          // await prefs.remove('pin');
-          // await prefs.remove('id');
-          // await prefs.remove('nom');
-          // await prefs.remove('prenom');
 
           EasyLoading.dismiss();
 
           // Naviguer vers la page de connexion
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => Connexion()),
+            MaterialPageRoute(builder: (context) => Accueil()),
           );
         } catch (e) {
           EasyLoading.dismiss();

@@ -9,9 +9,6 @@ import '../globals.dart';
 
 class ApiService {
 
-
-
-
   Future<http.Response> getLocationData(String text) async {
     http.Response response;
 

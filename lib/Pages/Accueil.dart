@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:johnclassic/Pages/Connexion/Connexion.dart';
 import 'package:johnclassic/Pages/res/CustomColors.dart';
 import 'package:video_player/video_player.dart';
+import 'Dashboard/Dashboard.dart';
 import 'HELPER/Utils.dart';
+import 'Services/Api.dart';
 
 class Accueil extends StatefulWidget {
   @override
@@ -32,8 +34,12 @@ class _AccueilState extends State<Accueil> {
           if (_isDisposed) return;
           _redirectTimer = Timer(Duration(seconds: 17), () {
             if (!_isDisposed && mounted) {
+              ApiService().getListeArticle();
+              ApiService().getListeCommande();
+              ApiService().getListeModePaiement();
+              ApiService().getListePublicite();
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => Connexion()),
+                MaterialPageRoute(builder: (_) => Dashboard()),
               );
             }
           });
@@ -83,7 +89,7 @@ class _AccueilState extends State<Accueil> {
                 _redirectTimer?.cancel();
                 if (mounted) {
                   Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => Connexion()),
+                    MaterialPageRoute(builder: (_) => Dashboard()),
                   );
                 }
               },

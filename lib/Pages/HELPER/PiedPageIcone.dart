@@ -180,9 +180,27 @@ class _PiedPageIconeState extends State<PiedPageIcone> with SingleTickerProvider
 
       if (chemin == 0) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Dashboard()));
-      } else if (chemin == 1) {
-        // Action catégories (tu peux modifier ici)
+      } else if (chemin == 1 ) {
+      if (isLoggedIn == false ){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 20,
+            content:Row(
+              children: [
+                Icon(Icons.info,color: Colors.white,),
+                Text(" Veuillez vous connecter  🫣!")
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+          else{
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Historiquecommande()));
+      }
+        // Action catégories (tu peux modifier ici)
+
       } else if (chemin == 2) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Assistance(title1: "Assistance")));
       }
