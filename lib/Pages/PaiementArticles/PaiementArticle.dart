@@ -1184,6 +1184,10 @@ class _PaiementarticleState extends State<Paiementarticle> {
         } else {
           print("mon tableau est ");
           print(produitCommande);
+          print("${"$baseUrl&task=addCommande&idUsersConnect=${dataResponse['id']}&idModePaiement=$modePaiement&produits=" + produitCommande}&montantTotal=$montantTotal&promo=" +
+              promo +
+              "&adresseLivraison=" +
+              adresseLivraison.text+"&montantLivraison="+montantLivraison.toString());
 
           http.Response response;
           response = await http.get(

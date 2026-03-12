@@ -12,6 +12,7 @@ import 'package:johnclassic/Pages/res/CustomColors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
+import 'Connexion/Connexion.dart';
 import 'Dashboard/Dashboard.dart';
 import 'HELPER/NetworkCheck.dart';
 import 'HELPER/PiedPageIcone.dart';
@@ -310,7 +311,30 @@ class _AssistanceState extends State<Assistance>{
                       Center(
                         child: ElevatedButton(
                             onPressed: (){
-                             if(KeyForm.currentState!.validate()){
+                              if (isLoggedIn == false ){
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    elevation: 20,
+                                    content:Row(
+                                      children: [
+                                        Icon(Icons.info,color: Colors.white,),
+                                        InkWell(
+                                          onTap:(){
+                                            Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => Connexion()),
+                                            );
+                                          },
+                                          child:  Text(" Veuillez vous connecter  🫣!"),
+                                        )
+                                      ],
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                             else if(KeyForm.currentState!.validate()){
                                sendMessage(idUser: dataResponse['id'],message: messageAssistance.text);
                              }
                             },

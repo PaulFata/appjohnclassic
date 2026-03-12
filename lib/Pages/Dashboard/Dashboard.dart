@@ -131,10 +131,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
   void initState() {
     isLoggedIn = dataResponse != null &&
         dataResponse['vcMsisdn'] != null;
-    ApiService().getListeArticle();
-    ApiService().getListeCommande();
-    ApiService().getListeModePaiement();
-    ApiService().getListePublicite();
+    // ApiService().getListeArticle();
+    // ApiService().getListeCommande();
+    // ApiService().getListeModePaiement();
+    // ApiService().getListePublicite();
 
     Pushy.listen();
     // Register the user for push notifications
@@ -198,6 +198,7 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
     mesArticlesFiltrer= mesArticles;
 
     super.initState();
+    _loadArticles();
 
     _fadeController = AnimationController(
       vsync: this,
@@ -216,6 +217,13 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
       });
 
   }
+
+  Future<void> _loadArticles() async {
+    await ApiService().getListeArticle(); // remplit mesArticles + mesArticlesFiltrer
+    if (!mounted) return;
+    setState(() {});
+  }
+
 
   @override
   void didChangeDependencies() {
@@ -287,150 +295,167 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        CustomColors().backgroundAppkapi.withOpacity(0.95),
-                        CustomColors().backgroundAppkapi.withOpacity(0.85),
+                        CustomColors().backgroundAppkapi.withOpacity(0.98),
+                        CustomColors().backgroundAppkapi.withOpacity(0.90),
                         Colors.white,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                   ),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      UserAccountsDrawerHeader(
-                        accountName: Text(
-                          isLoggedIn
-                              ? "${dataResponse['vcPrenom']} ${dataResponse['vcNom']}"
-                              : "Visiteur",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
-                        accountEmail: Text(
-                          isLoggedIn
-                              ? dataResponse['vcMsisdn'].toString()
-                              : "Navigation sans compte",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.white70,
-                            fontStyle: FontStyle.italic,
-                          ),
-                        ),
-                        currentAccountPictureSize: const Size(50, 50),
-                        currentAccountPicture: CircleAvatar(
-                          backgroundColor: Colors.white,
-                          child: ClipOval(
-                            child: Image.asset(
-                              "assets/images/logo.jpeg",
-                              fit: BoxFit.cover,
-                              width: 50,
-                              height: 50,
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        // Header utilisateur
+                        UserAccountsDrawerHeader(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          accountName: Text(
+                            isLoggedIn
+                                ? "${dataResponse['vcPrenom']} ${dataResponse['vcNom']}"
+                                : "Visiteur",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              CustomColors().backgroundColorAll,
-                              CustomColors().backgroundColorAll.withOpacity(0.85),
+                          accountEmail: Text(
+                            isLoggedIn
+                                ? dataResponse['vcMsisdn'].toString()
+                                : "Navigation sans compte",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Colors.white70,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                          currentAccountPictureSize: const Size(54, 54),
+                          currentAccountPicture: CircleAvatar(
+                            backgroundColor: Colors.white,
+                            child: ClipOval(
+                              child: Image.asset(
+                                "assets/images/logo.jpeg",
+                                fit: BoxFit.cover,
+                                width: 50,
+                                height: 50,
+                              ),
+                            ),
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                CustomColors().backgroundColorAll,
+                                CustomColors().backgroundColorAll.withOpacity(0.85),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 10,
+                                offset: Offset(0, 3),
+                              ),
                             ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
                           ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      ListTile(
-                        leading: const Icon(Icons.person, color: Colors.white),
-                        title: const Text(
-                          'A propos',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(color: Colors.white24, indent: 16, endIndent: 16),
-                      ListTile(
-                        leading: const Icon(Icons.security, color: Colors.white),
-                        title: const Text(
-                          'Conditions d\'utilisation',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      const Divider(color: Colors.white24, indent: 16, endIndent: 16),
-                      ListTile(
-                        leading: const Icon(Icons.help_center_outlined, color: Colors.white),
-                        title: const Text(
-                          'Assistance',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => Assistance(title1: "Assistance")),
-                          );
-                        },
-                      ),
-                      const Divider(color: Colors.white24, indent: 16, endIndent: 16),
-                      isLoggedIn
-                          ?
-                      ListTile(
-                        leading: const Icon(Icons.person, color: Colors.white),
-                        title: const Text(
-                          'Mon Profil',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => MonProfil()),
-                          );
-                        },
-                      ):
-                      ListTile(
-                        leading: const Icon(Icons.person, color: Colors.white),
-                        title: const Text(
-                          'Se connecter',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        onTap: () {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (context) => Connexion()),
-                          );
-                        },
-                      )
-                      ,
-                      const Divider(color: Colors.white24, indent: 16, endIndent: 16),
-                      isLoggedIn
-                          ?
-                      ListTile(
-                        leading: const Icon(Icons.login, color: Colors.redAccent),
-                        title: const Text(
-                          'Déconnexion',
-                          style: TextStyle(color: Colors.redAccent,fontWeight: FontWeight.bold),
-                        ),
-                        onTap: () => showAlertDialogDeconnexion(context),
-                      )
-                          :
-                      const SizedBox(height:0)
 
-                      ,
-                    ],
+                        // Contenu scrollable
+                        Expanded(
+                          child: ListView(
+                            padding: EdgeInsets.zero,
+                            children: [
+                              _DrawerItem(
+                                icon: Icons.info_outline,
+                                label: "À propos",
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  // TODO: ouvrir page A propos si tu veux
+                                },
+                              ),
+                              _DrawerItem(
+                                icon: Icons.privacy_tip_outlined,
+                                label: "Conditions d'utilisation",
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  // TODO: ouvrir page CGU
+                                },
+                              ),
+                              _DrawerItem(
+                                icon: Icons.support_agent_outlined,
+                                label: "Assistance",
+                                onTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          Assistance(title1: "Assistance"),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const Divider(
+                                color: Colors.white24,
+                                indent: 16,
+                                endIndent: 16,
+                                height: 24,
+                              ),
+                              isLoggedIn
+                                  ? _DrawerItem(
+                                icon: Icons.person_outline,
+                                label: "Mon profil",
+                                onTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => MonProfil(),
+                                    ),
+                                  );
+                                },
+                              )
+                                  : _DrawerItem(
+                                icon: Icons.login,
+                                label: "Se connecter",
+                                onTap: () {
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => Connexion(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              if (isLoggedIn)
+                                _DrawerItem(
+                                  icon: Icons.logout,
+                                  label: "Déconnexion",
+                                  color: Colors.redAccent,
+                                  bold: true,
+                                  onTap: () => showAlertDialogDeconnexion(context),
+                                ),
+                            ],
+                          ),
+                        ),
+
+                        // Petit texte en bas (branding)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 12, top: 4),
+                          child: Text(
+                            "John Classic • Votre style, notre signature",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Colors.black.withOpacity(0.45),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              )
+              ,
 
               body: SafeArea(
                 top: true,
@@ -462,429 +487,596 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
   }
 
   Container header() {
+    final width = MediaQuery.of(context).size.width;
+
     return Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.only(top: 5, bottom: 5),
+      width: width,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: CustomColors().backgroundAppkapi.withOpacity(0.8),
+        gradient: LinearGradient(
+          colors: [
+            CustomColors().backgroundAppkapi,
+            CustomColors().backgroundAppkapi.withOpacity(0.9),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(5),
-            child: Text("JOHN CLASSIC.",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white),
+          // Logo + nom appli
+          Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  "assets/images/logo.jpeg",
+                  width: 30,
+                  height: 30,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                "JOHN CLASSIC",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  letterSpacing: 1,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+
+          const Spacer(),
+
+          // Profil (ouvre le drawer)
+          InkWell(
+            onTap: () {
+              scaffoldKey.currentState!.openDrawer();
+            },
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.10),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.person_outline,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
           ),
-          IntrinsicHeight(
-            child: Row(
-              children: [
-                InkWell(
-                  onTap: (){
-                    // showNotification(context);
-                  },
-                  child:  Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Card(
-                      color: Colors.white,
-                      child: Icon(Icons.home, color: Colors.black),
-                    ),
-                  ),
-                )
-               ,
-                VerticalDivider(color: Colors.white),
-                Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      dropdownColor: Colors.white,
-                      icon: Icon(Icons.arrow_drop_down, color: Colors.white),
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                      value: selectedService,
-                      hint: const Text("Services", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedService = newValue;
-                          if(selectedService=="Boutique"){
-                            openService(context,chemin: 1);
-                          }
-                          else if(selectedService=="Décoration"){
-                            openService(context,chemin: 2);
-                          }
-                          else if(selectedService=="Immobilier"|| selectedService=="Coiffure"){
 
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                elevation: 20,
-                                content:Row(
-                                  children: [
-                                    Icon(Icons.info,color: Colors.white,),
-                                    Text("  Service bientôt disponible 🫣!")
-                                  ],
-                                ),
-                                backgroundColor: Colors.red,
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
-                          }
-                        });
-                      },
-                      items: <String>['Boutique', 'Immobilier','Décoration', 'Coiffure']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value, style: const TextStyle(color: Colors.black)
+          const SizedBox(width: 10),
+
+          // Panier avec badge nombre d'articles (y compris 0)
+          InkWell(
+            onTap: () {
+              if (nombreArticlePanier.toString() == "0") {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    elevation: 10,
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(12),
+                    content: Row(
+                      children: const [
+                        Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Votre panier est vide 🫣",
+                            style: TextStyle(fontSize: 13),
                           ),
-                        );
-                      }).toList(),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors.black87,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              } else {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => Monpanier()),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(999),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.10),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.shopping_bag_outlined,
+                    size: 22,
+                    color: Colors.white,
+                  ),
+                ),
+                Positioned(
+                  right: -2,
+                  top: -2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    child: Text(
+                      nombreArticlePanier.toString(), // toujours affiché (0, 1, 2...)
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-                VerticalDivider(color: Colors.white),
               ],
             ),
-          ),
-          IntrinsicHeight(
-            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InkWell(
-                  onTap:(){
-                    scaffoldKey.currentState!.openDrawer();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5),
-                    child: Card(color: Colors.white, child: Text("🧑🏾", style: TextStyle(fontSize: 12))),
-                  ),
-                ),
-                InkWell(
-                 onTap:(){
-                   if(nombreArticlePanier.toString()=="0"){
-                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(
-                         elevation: 20,
-                         content:Row(
-                           children: [
-                             Icon(Icons.info,color: Colors.white,),
-                             Text("  Votre Panier est vide  🫣!")
-                           ],
-                         ),
-                         backgroundColor: Colors.red,
-                         duration: Duration(seconds: 3),
-                       ),
-                     );
-                   }
-                   else{
-                     Navigator.of(context).pushReplacement(
-                       MaterialPageRoute(builder: (context) => Monpanier()),
-                     );
-                   }
-                 },
-                 child:  Stack(
-                   children: [
-                     Icon(Icons.shopping_cart,size: 40,color: Colors.white,),
-                     Positioned(
-                       right: 20,
-                       top: 0,
-                       child:InkWell(
-                         onTap: (){
+          )
 
-                         },
-                         child: Container(
-                           width: 20,
-
-                           decoration: BoxDecoration(
-                               shape: BoxShape.circle,
-                               color: Colors.red
-                           ),
-                           child:Center(
-                             child: Text(nombreArticlePanier.toString(),
-                               style:TextStyle(
-                                   color: Colors.white,
-                                   fontSize: 15,
-                                   fontWeight: FontWeight.bold
-                               ) ,),
-                           ),
-                         ),
-                       ),
-
-                     )
-                   ],
-                 ),
-               )
-              ],
-            ),
-          ),
-          const SizedBox(width: 5,)
         ],
       ),
     );
   }
 
+
+
   SingleChildScrollView body(BoxConstraints constraints) {
-    int nbColonnes = constraints.maxWidth <= 600 ? 2 : 2;
-    int nbGroupes = (mesArticlesFiltrer.length / nbColonnes).ceil();
+    final bool isSmall = constraints.maxWidth <= 600;
+    final double videoHeight = isSmall ? 200 : 220;
+
+    final int nbColonnes = 1;
+    final int nbGroupes = (mesArticlesFiltrer.length / nbColonnes).ceil();
+
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: constraints.maxWidth <= 600 ? 200 : 220,
-            child: _controller.value.isInitialized ? VideoPlayer(_controller) : Container(),
+          // Hero vidéo
+          SizedBox(
+            height: videoHeight,
+            width: double.infinity,
+            child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16),
+              ),
+              child: _controller.value.isInitialized
+                  ? VideoPlayer(_controller)
+                  : Container(color: Colors.black12),
+            ),
           ),
-          const SizedBox(height: 10),
-          constraints.maxWidth<600?
+
+          const SizedBox(height: 12),
+
+          // Services (boutique / immo / déco / coiffure)
           Card(
             color: Colors.white,
-            elevation: 10,
+            elevation: 4,
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Container(
-              height: 100,
-              padding: constraints.maxWidth <= 600
-                  ? const EdgeInsets.symmetric(horizontal: 2)
-                  : const EdgeInsets.symmetric(horizontal: 10),
-              child: ListView(
+              height: 110,
+              padding: EdgeInsets.symmetric(
+                horizontal: isSmall ? 6 : 12,
+                vertical: 8,
+              ),
+              child: isSmall
+                  ? ListView(
                 scrollDirection: Axis.horizontal,
-
-                padding: EdgeInsets.only(left: 10),
                 children: [
-                  containerService(constraints, imageService: "assets/images/logoJohnClassic.jpeg", textService: "Boutique", chemin: 1),
-                  containerService(constraints, imageService: "assets/images/immo.jpeg", textService: "Immobilier", chemin: 3),
-
-                  containerService(constraints, imageService: "assets/images/petit.png", textService: "Décoration", chemin: 2),
-
-                  containerService(constraints, imageService: "assets/images/coiff.jpeg", textService: "Coiffure", chemin: 4),
+                  const SizedBox(width: 4),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/logoJohnClassic.jpeg",
+                    textService: "Boutique",
+                    chemin: 1,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/immo.jpeg",
+                    textService: "Immobilier",
+                    chemin: 3,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/petit.png",
+                    textService: "Décoration",
+                    chemin: 2,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/coiff.jpeg",
+                    textService: "Coiffure",
+                    chemin: 4,
+                  ),
+                  const SizedBox(width: 4),
+                ],
+              )
+                  : Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                alignment: WrapAlignment.spaceEvenly,
+                children: [
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/logoJohnClassic.jpeg",
+                    textService: "Boutique",
+                    chemin: 1,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/immo.jpeg",
+                    textService: "Immobilier",
+                    chemin: 3,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/petit.png",
+                    textService: "Décoration",
+                    chemin: 2,
+                  ),
+                  containerService(
+                    constraints,
+                    imageService: "assets/images/coiff.jpeg",
+                    textService: "Coiffure",
+                    chemin: 4,
+                  ),
                 ],
               ),
             ),
-          ):
-          Card(
-            color: Colors.white,
-            elevation: 10,
-            child: Container(
-              height: 100,
-              width: MediaQuery.of(context).size.width,
-              padding: constraints.maxWidth <= 600
-                  ? const EdgeInsets.symmetric(horizontal: 2)
-                  : const EdgeInsets.symmetric(horizontal: 10),
-              child: Wrap(
-              spacing: 12,
-              runSpacing: 8,
-              alignment: WrapAlignment.spaceEvenly,
-              children: [
-                containerService(constraints, imageService: "assets/images/logoJohnClassic.jpeg", textService: "Boutique", chemin: 1),
-                containerService(constraints, imageService: "assets/images/immo.jpeg", textService: "Immobilier", chemin: 3),
-                containerService(constraints, imageService: "assets/images/petit.png", textService: "Décoration", chemin: 2),
+          ),
 
-                containerService(constraints, imageService: "assets/images/coiff.jpeg", textService: "Coiffure", chemin: 4),
-              ],
+          const SizedBox(height: 16),
 
+          // Slogan marketing
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Habillez‑vous comme vous le méritez.",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
             ),
-
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "Des pièces sélectionnées pour un style unique, chaque jour.",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w400,
+                color: Colors.grey.shade700,
+              ),
+            ),
           ),
-          const SizedBox(height: 10,),
-          Padding(padding: EdgeInsets.only(left: 10),
-              child: Row(mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Votre look, notre passion.! 💪🏼",
-                    style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold
 
-                    ),),
-                ],
-              )
-          ),
-          Padding(padding: EdgeInsets.only(left: 10),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Nouveautés 😍",
-                    style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold
+          const SizedBox(height: 20),
 
-                    ),),
-                  InkWell(
-                    onTap: (){
-
-                      openService(context,chemin: 1);
-
-                    },
-                    child: Text("voir plus .... 👉🏼 ",
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold
-
-                      ),),
+          // Titre section nouveautés + bouton "voir plus"
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Nouveautés",
+                  style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black87,
                   ),
-                ],
-              )
+                ),
+                InkWell(
+                  onTap: () {
+                    openService(context, chemin: 1);
+                  },
+                  borderRadius: BorderRadius.circular(999),
+                  child: Row(
+                    children: const [
+                      Text(
+                        "Voir tout",
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: Colors.black87,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 20,),
-      mesArticlesFiltrer != null
-          ? (mesArticlesFiltrer.isNotEmpty
-          ? SizedBox(
-        height:
-        MediaQuery.of(context).size.height * 0.6,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: nbGroupes,
-          itemBuilder: (context, groupeIndex) {
-            int start = groupeIndex * nbColonnes;
-            int end = (start + nbColonnes > mesArticlesFiltrer.length)
-                ? mesArticlesFiltrer.length
-                : start + nbColonnes;
-            List<dynamic> articlesGroupe = mesArticlesFiltrer.sublist(start, end);
 
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Column(
-                  children: articlesGroupe.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    var article = entry.value;
+          const SizedBox(height: 16),
 
-                    return TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: Duration(milliseconds: 500 + (index * 100)),
-                      builder: (context, value, child) {
-                        return Opacity(
-                          opacity: value,
-                          child: Transform.translate(
-                            offset: Offset(0, 30 * (1 - value)),
-                            child: child,
-                          ),
-                        );
+          // ===================== LISTE / LOADER =====================
+          if (mesArticlesFiltrer == null)
+          // Loader custom pendant chargement API
+            const Padding(
+              padding: EdgeInsets.only(top: 40),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (mesArticlesFiltrer.isEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Loader animé centré
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.redAccent),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      "Chargement des nouveautés...",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    // Relance l'appel API en arrière-plan
+                    FutureBuilder(
+                      future: _loadArticles(),
+                      builder: (context, snapshot) {
+                        return const SizedBox.shrink();
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              lieuApel="dash";
-                              dataIdCouleurAndCouleur = article["couleurs"];
-                              dataidTailleAndTaille = article["tailles"];
-                              idProduitPanier = int.parse(article["id"].toString());
-                              prixPromoArticle = calculerPrixAvecPromo(
-                                article["prix"].toString(),
-                                article["promo"].toString(),
-                              );
-                            });
+                    ),
+                  ],
+                ),
+              ),
+            )
 
-                            showDialog(
-                              context: context,
-                              builder: (_) => ZoomDialog(
-                                description: article["description"].toString(),
-                                 prix:prixPromoArticle.toStringAsFixed(0),
-                                //   prix:article["prix"].toString(),
-                                viewNombre: article["QuanttiteDisponible"].toString(),
-                                imageArticle: article["image"].toString(),
-                                categorie: article["categorie"].toString(),
-                                couleur: article["couleurs"],
-                                taille: article["tailles"],
-                                idProduit: article["id"],
+
+          else
+            SizedBox(
+              height: isSmall
+                  ? MediaQuery.of(context).size.height * 0.6
+                  : MediaQuery.of(context).size.height * 0.55,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: nbGroupes,
+                itemBuilder: (context, groupeIndex) {
+                  final int start = groupeIndex * nbColonnes;
+                  final int end =
+                  (start + nbColonnes > mesArticlesFiltrer.length)
+                      ? mesArticlesFiltrer.length
+                      : start + nbColonnes;
+                  final List<dynamic> articlesGroupe =
+                  mesArticlesFiltrer.sublist(start, end);
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Column(
+                      children: articlesGroupe.asMap().entries.map((entry) {
+                        final int index = entry.key;
+                        final article = entry.value;
+
+                        return TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.0, end: 1.0),
+                          duration: Duration(
+                            milliseconds: 400 + (index * 120),
+                          ),
+                          builder: (context, value, child) {
+                            return Opacity(
+                              opacity: value,
+                              child: Transform.translate(
+                                offset: Offset(0, 24 * (1 - value)),
+                                child: child,
                               ),
                             );
                           },
-                          child: Stack(
-                            children: [
-                              // ... ton widget Card ici inchangé ...
-                              Card(
-                                elevation: 1,
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15)),
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  width: constraints.maxWidth <= 600
-                                      ? MediaQuery.of(context).size.width * 0.3
-                                      : MediaQuery.of(context).size.width * 0.23,
-                                  height: constraints.maxWidth <= 600
-                                      ? MediaQuery.of(context).size.width * 0.5
-                                      : MediaQuery.of(context).size.width * 0.33,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(15),
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  lieuApel = "dash";
+                                  dataIdCouleurAndCouleur =
+                                  article["couleurs"];
+                                  dataidTailleAndTaille =
+                                  article["tailles"];
+                                  idProduitPanier =
+                                      int.parse(article["id"].toString());
+                                  prixPromoArticle = calculerPrixAvecPromo(
+                                    article["prix"].toString(),
+                                    article["promo"].toString(),
+                                  );
+                                });
+
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => ZoomDialog(
+                                    description: article["description"]
+                                        .toString(),
+                                    prix: prixPromoArticle
+                                        .toStringAsFixed(0),
+                                    viewNombre: article[
+                                    "QuanttiteDisponible"]
+                                        .toString(),
+                                    imageArticle:
+                                    article["image"].toString(),
+                                    categorie:
+                                    article["categorie"].toString(),
+                                    couleur: article["couleurs"],
+                                    taille: article["tailles"],
+                                    idProduit: article["id"],
                                   ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Expanded(
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: CachedNetworkImage(
-                                            imageUrl: article["image"].toString(),
-                                            fit: BoxFit.cover,
-                                            height: 40,
-                                            width: 120,
-                                            placeholder: (context, url) =>
-                                                Shimmer.fromColors(
-                                                  baseColor: Colors.grey.shade300,
-                                                  highlightColor: Colors.grey.shade100,
-                                                  child: Container(color: Colors.white),
-                                                ),
-                                            errorWidget: (context, url, error) => Container(
-                                              color: Colors.grey[200],
-                                              child: const Icon(Icons.error, color: Colors.red),
+                                );
+                              },
+                              child: Stack(
+                                children: [
+                                  Card(
+                                    elevation: 3,
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                      BorderRadius.circular(16),
+                                    ),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(10),
+                                      width: isSmall
+                                          ? MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.36
+                                          : MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.24,
+                                      height: isSmall
+                                          ? MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.60
+                                          : MediaQuery.of(context)
+                                          .size
+                                          .width *
+                                          0.38,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                        BorderRadius.circular(16),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          Expanded(
+                                            child: ClipRRect(
+                                              borderRadius:
+                                              BorderRadius.circular(12),
+                                              child: CachedNetworkImage(
+                                                imageUrl: article["image"]
+                                                    .toString(),
+                                                fit: BoxFit.cover,
+                                                placeholder:
+                                                    (context, url) =>
+                                                    Shimmer.fromColors(
+                                                      baseColor:
+                                                      Colors.grey.shade300,
+                                                      highlightColor:
+                                                      Colors.grey.shade100,
+                                                      child: Container(
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                    Container(
+                                                      color: Colors.grey[200],
+                                                      child: const Icon(
+                                                        Icons
+                                                            .image_not_supported,
+                                                        color: Colors.grey,
+                                                      ),
+                                                    ),
+                                              ),
                                             ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            article["nomArticle"]
+                                                .toString(),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                          priceWidget(article),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (double.tryParse(
+                                    article["promo"].toString(),
+                                  ) !=
+                                      null)
+                                    Positioned(
+                                      top: 10,
+                                      left: 10,
+                                      child: Container(
+                                        padding:
+                                        const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.redAccent,
+                                          borderRadius:
+                                          BorderRadius.circular(20),
+                                        ),
+                                        child: Text(
+                                          "${article["promo"]}%",
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 11,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        article["nomArticle"].toString(),
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                                      ),
-                                      priceWidget(article),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                ],
                               ),
-                              if (double.tryParse(article["promo"].toString()) != null)
-                                Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      "${article["promo"]}%",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12),
-                                    ),
-                                  ),
-                                ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
               ),
-            );
-          },
-        ),
-      )
-          : const Center(
-        child: Icon(
-            Icons.hourglass_empty,
-            size: 40,
-            color: Colors.grey
-        ),
-      )
-      )
-          : const Center(
-        child: CircularProgressIndicator(),
-      )
+            ),
 
-      ],
+          const SizedBox(height: 24),
+        ],
       ),
-    );
+    )
+    ;
   }
+
   //fonction de calcul du priux de promo s'il existe pour passer au panier
   double calculerPrixAvecPromo(String prixStr, String promoStr) {
     double prix = double.tryParse(prixStr) ?? 0;
@@ -898,64 +1090,83 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
 
     return prix;
   }
-  Widget containerService(BoxConstraints constraints, {required String imageService, required String textService, required int chemin}) {
+  Widget containerService(
+      BoxConstraints constraints, {
+        required String imageService,
+        required String textService,
+        required int chemin,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 6),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          const SizedBox(height: 10,),
+          const SizedBox(height: 8),
           InkWell(
-              onTap:(){
-                if(chemin==1){
-
-                  openService(context,chemin: chemin);
-                }
-                else if(chemin==2){
-                  openService(context,chemin: chemin);
-                }
-                else if(chemin==3|| chemin==4){
-                  print("je rentre bien 5555");
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      elevation: 20,
-                      content:Row(
-                        children: [
-                          Icon(Icons.info,color: Colors.white,),
-                          Text("  Service bientôt disponible 🫣!")
-                        ],
-                      ),
-                      backgroundColor: Colors.red,
-                      duration: Duration(seconds: 3),
+            onTap: () {
+              if (chemin == 1 || chemin == 2) {
+                openService(context, chemin: chemin);
+              } else if (chemin == 3 || chemin == 4) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    elevation: 10,
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(12),
+                    content: Row(
+                      children: const [
+                        Icon(Icons.info_outline, color: Colors.white),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            "Service bientôt disponible 🫣",
+                            style: TextStyle(fontSize: 13),
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                }
-              },
+                    backgroundColor: Colors.black87,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(10),
             child: Container(
-              padding: EdgeInsets.all(2),
-              width: 94,
-              height: 50,
+              width: 90,
+              height: 60,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                image: DecorationImage(
-                  image: AssetImage(imageService),
-                  fit: BoxFit.fitHeight,
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Colors.deepOrange,
+                  width: 0.6,
                 ),
-                boxShadow: [BoxShadow(color: Colors.transparent, blurRadius: 0, spreadRadius: 0)],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Image.asset(
+                  imageService,
+                  fit: BoxFit.contain, // logo entièrement visible
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          AnimatedOpacity(
-            opacity: 1.0,
-            duration: const Duration(milliseconds: 800),
-            child: Text(textService,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          const SizedBox(height: 6),
+          Text(
+            textService,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
             ),
-          )
+          ),
         ],
       ),
     );
   }
+
+
   Widget priceWidget(Map<String, dynamic> article) {
     double prix = double.tryParse(article["prix"].toString()) ?? 0;
     String promoStr = article["promo"].toString();
@@ -1013,39 +1224,79 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
     }
   }
 
-  openService(BuildContext context,{required chemin}){
+  Future<void> openService(
+      BuildContext context, {
+        required int chemin,
+      }) async {
     _showLoader();
 
-    ApiService().getListeArticle();
-    Future.delayed(Duration(seconds: 3), () {
-      _hideLoader();
+    try {
+      if (chemin == 1) {
+        // Charger les articles puis filtrer les vestes
+        await ApiService().getListeArticle();
 
-      // Naviguer vers Dashboard
-      if(chemin==1){
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Vetement()),
-        );
-        //***********
         mesArticlesFiltrer = (mesArticles ?? [])
             .where((element) =>
         (element["categorie"] ?? "")
             .toString()
-            .toLowerCase() == "veste")
+            .toLowerCase() ==
+            "veste")
             .toList();
-      }
-      else if(chemin==2){
+
+        // Petite pause pour laisser le loader respirer (optionnel)
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        _hideLoader();
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Vetement()),
+        );
+      } else if (chemin == 2) {
+        // Décoration
         chargementImageDecor();
+        await Future.delayed(const Duration(milliseconds: 500));
+
+        _hideLoader();
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => Decor()),
         );
+      } else if (chemin == 5) {
+        // Simple refresh liste article, sans navigation
+        await ApiService().getListeArticle();
+        _hideLoader();
+      } else {
+        // Chemin inconnu : on masque le loader pour éviter blocage
+        _hideLoader();
       }
-      else if(chemin==5){
-        ApiService().getListeArticle();
-      }
-    });
+    } catch (e) {
+      _hideLoader();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 10,
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.all(12),
+          content: Row(
+            children: [
+              const Icon(Icons.error_outline, color: Colors.white),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Une erreur s'est produite. Veuillez réessayer.",
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.redAccent,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
+
   Future<void> showAlertDialogDeconnexion(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -1147,134 +1398,191 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
       builder: (BuildContext context) => alert,
     );
   }
-  chargementImageDecor() {
-    // Liste temporaire pour ajouter les articles
-    List<DecorJohn> DecorJohnToAdd = [
+  void chargementImageDecor() {
+    final List<DecorJohn> decorJohnToAdd = [
       DecorJohn(
         idDecor: 1,
-        descriptionDescor:"Un design simple et lumunieux",
+        descriptionDescor: "✨ Design simple & lumineux",
         imageDecor: "assets/images/DecorImage/decor7.jpg",
-
       ),
       DecorJohn(
         idDecor: 2,
-        descriptionDescor:"✨ Minimaliste & Haut de gamme",
+        descriptionDescor: "✨ Minimaliste & haut de gamme",
         imageDecor: "assets/images/DecorImage/decor8.jpg",
-
       ),
       DecorJohn(
         idDecor: 3,
-        descriptionDescor:"✨ Élégant & sophistiqué",
+        descriptionDescor: "✨ Élégant & sophistiqué",
         imageDecor: "assets/images/DecorImage/decor13.jpg",
-
       ),
       DecorJohn(
         idDecor: 4,
-        descriptionDescor:"✨ Élégant & sophistiqué",
+        descriptionDescor: "✨ Élégant & raffiné",
         imageDecor: "assets/images/DecorImage/decor10.jpg",
-
       ),
       DecorJohn(
         idDecor: 5,
-        descriptionDescor:"✨ Naturel & éco-friendly",
+        descriptionDescor: "✨ Naturel & éco‑friendly",
         imageDecor: "assets/images/DecorImage/decor11.jpg",
-
       ),
       DecorJohn(
         idDecor: 6,
-        descriptionDescor:"✨ Tendance & créatif",
+        descriptionDescor: "✨ Tendance & créatif",
         imageDecor: "assets/images/DecorImage/decor12.jpg",
-
       ),
       DecorJohn(
         idDecor: 7,
-        descriptionDescor:"✨ Ambiance cocooning & chaleureuse",
+        descriptionDescor: "✨ Ambiance cocooning & chaleureuse",
         imageDecor: "assets/images/31.jpeg",
-
       ),
       DecorJohn(
         idDecor: 8,
-        descriptionDescor:"✨ Ambiance cocooning & chaleureuse",
+        descriptionDescor: "✨ Ambiance cocooning & chaleureuse",
         imageDecor: "assets/images/DecorImage/decor6.jpg",
-
       ),
     ];
 
-    // Ajout des articles dans mesArticles seulement si l'idArticle n'existe pas déjà
-    for (var decor in DecorJohnToAdd) {
-      // Vérification si l'ID de l'article existe déjà dans mesArticles
-      bool existeDeja = malisteDecor.any((existingDecor) => existingDecor.idDecor == decor.idDecor);
+    for (final decor in decorJohnToAdd) {
+      final bool existeDeja = malisteDecor
+          .any((existingDecor) => existingDecor.idDecor == decor.idDecor);
 
-      // Si l'article n'existe pas déjà, on l'ajoute à la liste
       if (!existeDeja) {
         malisteDecor.add(decor);
       } else {
-        print('L\'article avec l\'id ${decor.idDecor} existe déjà');
+        debugPrint("Le décor avec l'id ${decor.idDecor} existe déjà");
       }
     }
 
-    // Afficher la liste des articles après ajout
-    print("La liste des articles :");
-    malisteDecor.forEach((decor) {
-      print('ID: ${decor.idDecor}, Description: ${decor.descriptionDescor}');
-    });
+    debugPrint("Liste décor :");
+    for (final decor in malisteDecor) {
+      debugPrint("ID: ${decor.idDecor}, Description: ${decor.descriptionDescor}");
+    }
   }
+
 
   //**********Affichage notification******
 
   void showNotification(BuildContext context, Map<String, dynamic> pub) {
+    final String? imageUrl = pub["url"] as String?;
+    final String? titre = pub["titre"] as String?;
+    final String? sousTitre = pub["sousTitre"] as String?;
+    final String? dateExpire = pub["dateExpire"] as String?;
+
     Flushbar(
       margin: const EdgeInsets.all(12),
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       backgroundColor: Colors.transparent,
       duration: const Duration(seconds: 8),
       flushbarPosition: FlushbarPosition.TOP,
-      padding: const EdgeInsets.only(top: 40, left: 5, right: 5, bottom: 12),
+      padding: const EdgeInsets.only(top: 40, left: 4, right: 4, bottom: 8),
       messageText: Stack(
         clipBehavior: Clip.none,
         children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  pub["url"],
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.black.withOpacity(0.75),
+                  Colors.black.withOpacity(0.85),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
               ),
-              const SizedBox(height: 12),
-              // if (pub["dateExpire"] != null)
-              //   Text(
-              //     "Expire le ${pub["dateExpire"]}",
-              //     textAlign: TextAlign.center,
-              //     style: const TextStyle(
-              //       color: Colors.white70,
-              //       fontSize: 14,
-              //       fontWeight: FontWeight.w500,
-              //     ),
-              //   ),
-            ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (imageUrl != null && imageUrl.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18),
+                    ),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      height: 180,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: 180,
+                        color: Colors.grey.shade800,
+                        child: const Center(
+                          child: Icon(
+                            Icons.image_not_supported,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                Padding(
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (titre != null && titre.isNotEmpty)
+                        Text(
+                          titre,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      if (sousTitre != null && sousTitre.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            sousTitre,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.85),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                      if (dateExpire != null && dateExpire.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            "Valable jusqu’au $dateExpire",
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 11,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
+          // Bouton fermer
           Positioned(
             top: -10,
             right: -10,
             child: GestureDetector(
               onTap: () {
-                Navigator.of(context).pop(); // ferme la notification
+                Navigator.of(context, rootNavigator: true).pop();
               },
               child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.orangeAccent,
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.75),
                   shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white24, width: 1),
                 ),
                 padding: const EdgeInsets.all(6),
                 child: const Icon(
                   Icons.close,
                   color: Colors.white,
-                  size: 20,
+                  size: 18,
                 ),
               ),
             ),
@@ -1287,6 +1595,40 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
 
 
 
+
+}
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+  final bool bold;
+
+  const _DrawerItem({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+    this.bold = false,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Color textColor = color ?? Colors.white;
+    return ListTile(
+      leading: Icon(icon, color: textColor),
+      title: Text(
+        label,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 14,
+          fontWeight: bold ? FontWeight.w700 : FontWeight.w500,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
 }
 
 

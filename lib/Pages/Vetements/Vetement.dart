@@ -95,7 +95,6 @@ class _VetementState extends State<Vetement> {
 
   @override
   void initState() {
-    print("je lance la page ici");
     ApiService().getListeArticle();
     ApiService().getListeModePaiement();
 

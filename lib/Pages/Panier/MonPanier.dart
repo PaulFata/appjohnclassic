@@ -7,6 +7,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/utils.dart';
 import 'package:intl/intl.dart';
+import 'package:johnclassic/Pages/Connexion/Connexion.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:johnclassic/Pages/HELPER/PiedPageIcone.dart';
@@ -29,14 +30,39 @@ class _MonpanierState extends State<Monpanier> {
   Widget _buildButtonPaiement(BoxConstraints constraints) {
     return InkWell(
       onTap: () {
-        setState(() {
-          MontantTotalAchat = montantTotalPanier + montantLivraison;
-        });
+        if (isLoggedIn == false ){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              elevation: 20,
+              content:Row(
+                children: [
+                  Icon(Icons.info,color: Colors.white,),
+                  InkWell(
+                    onTap:(){
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => Connexion()),
+                      );
+                    },
+                    child:  Text(" Veuillez vous connecter  🫣!"),
+                  )
+                ],
+              ),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+       else{
+          setState(() {
+            MontantTotalAchat = montantTotalPanier + montantLivraison;
+          });
 
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Paiementarticle()),
-        );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Paiementarticle()),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(30),
       child: Container(

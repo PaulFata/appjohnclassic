@@ -124,6 +124,7 @@ class _ConnexionState extends State<Connexion> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 30),
+
           Column(
             children: [
               Utils().animationContentTop(
@@ -147,13 +148,39 @@ class _ConnexionState extends State<Connexion> {
             ],
           ),
 
-          Utils().animationContentTop(context: context, child: content()),
+          Utils().animationContentTop(
+            context: context,
+            child: content(),
+          ),
+
+          // === Bouton retour à l'accueil ===
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white.withOpacity(0.9),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => Dashboard()),
+                );
+              },
+              icon: const Icon(Icons.home),
+              label: const Text("Retour à l'accueil"),
+            ),
+          ),
 
           const SizedBox(height: 5),
         ],
       ),
     );
   }
+
 
   Card content() {
     return Card(

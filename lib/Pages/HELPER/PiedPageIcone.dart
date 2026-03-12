@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:johnclassic/Pages/Assistance.dart';
 import 'package:johnclassic/Pages/HistoriqueCommande/HistoriqueCommande.dart';
+import '../Connexion/Connexion.dart';
 import '../Dashboard/Dashboard.dart';
 import '../Services/Api.dart';
 import '../res/CustomColors.dart';
@@ -188,7 +189,15 @@ class _PiedPageIconeState extends State<PiedPageIcone> with SingleTickerProvider
             content:Row(
               children: [
                 Icon(Icons.info,color: Colors.white,),
-                Text(" Veuillez vous connecter  🫣!")
+                InkWell(
+                  onTap:(){
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => Connexion()),
+                    );
+                  },
+                  child:  Text(" Veuillez vous connecter  🫣!"),
+                )
               ],
             ),
             backgroundColor: Colors.red,

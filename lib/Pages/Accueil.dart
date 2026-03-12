@@ -15,46 +15,59 @@ class Accueil extends StatefulWidget {
 class _AccueilState extends State<Accueil> {
   late VideoPlayerController _controller;
   Timer? _redirectTimer;
-  bool _isDisposed = false; // Flag pour savoir si dispose a été appelé
+  bool _isDisposed = false;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialisation du controller
     _controller = VideoPlayerController.asset('assets/images/AccueilPub.mp4')
       ..initialize().then((_) {
-        if (_isDisposed) return; // Sécurité si le widget est déjà détruit
-        setState(() {}); // Met à jour l'UI
+        if (_isDisposed) return;
+        setState(() {});
         _safePlayVideo();
         _controller.setLooping(false);
 
-        // Timer pour redirection après la vidéo
+        // Lancer le timer + chargement des données
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_isDisposed) return;
-          _redirectTimer = Timer(Duration(seconds: 17), () {
-            if (!_isDisposed && mounted) {
-              ApiService().getListeArticle();
-              ApiService().getListeCommande();
-              ApiService().getListeModePaiement();
-              ApiService().getListePublicite();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => Dashboard()),
-              );
-            }
+          _redirectTimer = Timer(const Duration(seconds: 17), () async {
+            if (_isDisposed || !mounted) return;
+
+            await _loadInitialData();
+
+            if (_isDisposed || !mounted) return;
+
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => Dashboard()),
+            );
           });
         });
       });
   }
 
-  // Fonction sécurisée pour jouer la vidéo
+  /// Regroupe tous les appels API et les exécute en parallèle
+  Future<void> _loadInitialData() async {
+    try {
+      await Future.wait<void>([
+        ApiService().getListeArticle(),
+        ApiService().getListeCommande(),
+        ApiService().getListeModePaiement(),
+        ApiService().getListePublicite(),
+      ]);
+    } catch (e, st) {
+      debugPrint('Erreur chargement données: $e');
+      debugPrint('$st');
+    }
+  }
+
+
   void _safePlayVideo() {
     if (!_isDisposed && _controller.value.isInitialized) {
       _controller.play();
     }
   }
 
-  // Fonction sécurisée pour mettre en pause
   void _safePauseVideo() {
     if (!_isDisposed && _controller.value.isInitialized) {
       _controller.pause();
@@ -63,7 +76,7 @@ class _AccueilState extends State<Accueil> {
 
   @override
   void dispose() {
-    _isDisposed = true; // Indique que le widget est détruit
+    _isDisposed = true;
     _redirectTimer?.cancel();
     _controller.dispose();
     super.dispose();
@@ -80,25 +93,46 @@ class _AccueilState extends State<Accueil> {
                 ? VideoPlayer(_controller)
                 : Container(color: Colors.black),
           ),
+
           // Bouton Continuer
           Positioned(
             top: MediaQuery.of(context).size.height * 0.9,
             child: Utils().elevatedButtonIosAndroid(
-              onPressed: () {
+              onPressed: () async {
                 _safePauseVideo();
                 _redirectTimer?.cancel();
-                if (mounted) {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (_) => Dashboard()),
-                  );
+
+                if (!mounted) return;
+
+                // Affichage d'un loader pendant le chargement des données
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (_) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+
+                try {
+                  await _loadInitialData();
+                } finally {
+                  if (!mounted) return;
+                  Navigator.of(context).pop(); // ferme le loader
                 }
+
+                if (!mounted) return;
+
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (_) => Dashboard()),
+                );
               },
               style: ButtonStyle(
                 foregroundColor: MaterialStateProperty.all(Colors.white),
-                backgroundColor:
-                MaterialStateProperty.all(CustomColors().backgroundAppkapi),
+                backgroundColor: MaterialStateProperty.all(
+                  CustomColors().backgroundAppkapi,
+                ),
                 shape: MaterialStateProperty.all(
-                  RoundedRectangleBorder(
+                  const RoundedRectangleBorder(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(0),
                       bottomRight: Radius.circular(10),
