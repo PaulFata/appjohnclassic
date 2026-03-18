@@ -252,7 +252,7 @@ class _AssistanceState extends State<Assistance>{
                       const SizedBox(height: 10,),
                       TextFormField(
                         style: TextStyle(
-                            color: CustomColors().backgroundColorAll
+                            color: Colors.black
                         ),
                         controller:messageAssistance,
                         maxLength: 200,
@@ -443,13 +443,13 @@ class _AssistanceState extends State<Assistance>{
           return;
         } else {
           print('connected');
-
+          print("$baseUrl&task=addMessageAssistance&userConnect=$idUser&vcMessage=$message");
           startTimer(context);//veroifier la connectivite au bout de 8 min
 
           http.Response response;
           response = await http.get(Uri.parse("$baseUrl&task=addMessageAssistance&userConnect=$idUser&vcMessage=$message")
           );
-          print("$baseUrl&task=addMessageAssistance&userConnect=$idUser&vcMessage=$message");
+
           var jsonResponse = json.decode(response.body);
 
           if (jsonResponse["status"] == 200) {

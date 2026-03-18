@@ -273,6 +273,7 @@ class _HistoriquecommandeState extends State<Historiquecommande> {
         const SizedBox(height: 4),
 
         // ====== Corps principal ======
+        // ====== Corps principal ======
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -302,359 +303,382 @@ class _HistoriquecommandeState extends State<Historiquecommande> {
                   ),
                 ),
               )
-                  : SingleChildScrollView(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: List.generate(listFiltre.length, (index) {
-                    final isSelected = index == selectedIndex;
-                    final cmd = listFiltre[index];
+                  : ListView.builder(
+                padding: const EdgeInsets.fromLTRB(12, 12, 12, 80),
+                itemCount: listFiltre.length,
+                itemBuilder: (context, index) {
+                  final isSelected = index == selectedIndex;
+                  final cmd = listFiltre[index];
 
-                    final statutTexte = convertStatut(cmd["statut"]);
-                    final statutLower =
-                    cmd["statut"].toString().toLowerCase();
+                  final statutTexte = convertStatut(cmd["statut"]);
+                  final statutLower = cmd["statut"].toString().toLowerCase();
 
-                    Color statutColor;
-                    IconData statutIcon;
-                    if (statutLower == "pending") {
-                      statutColor = Colors.orangeAccent;
-                      statutIcon = Icons.watch_later_rounded;
-                    } else if (statutLower == "failed") {
-                      statutColor = Colors.redAccent;
-                      statutIcon = Icons.cancel_rounded;
-                    } else {
-                      statutColor = Colors.green;
-                      statutIcon = Icons.check_circle_rounded;
-                    }
+                  Color statutColor;
+                  IconData statutIcon;
+                  if (statutLower == "pending") {
+                    statutColor = Colors.orangeAccent;
+                    statutIcon = Icons.watch_later_rounded;
+                  } else if (statutLower == "failed") {
+                    statutColor = Colors.redAccent;
+                    statutIcon = Icons.cancel_rounded;
+                  } else {
+                    statutColor = Colors.green;
+                    statutIcon = Icons.check_circle_rounded;
+                  }
 
-                    return Column(
-                      children: [
-                        // ===== Card commande =====
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          curve: Curves.easeInOut,
-                          margin:
-                          const EdgeInsets.symmetric(vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: isSelected
-                                  ? CustomColors()
+                  return Column(
+                    children: [
+                      // ===== Card commande =====
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        margin: const EdgeInsets.symmetric(vertical: 6),
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                            colors: [
+                              CustomColors()
                                   .backgroundAppkapi
-                                  .withOpacity(0.5)
-                                  : Colors.grey.shade200,
-                            ),
-                            boxShadow: [
-                              if (isSelected)
-                                BoxShadow(
-                                  color: CustomColors()
-                                      .backgroundAppkapi
-                                      .withOpacity(0.2),
-                                  blurRadius: 12,
-                                  offset: const Offset(0, 4),
-                                ),
+                                  .withOpacity(0.06),
+                              Colors.white,
                             ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          )
+                              : null,
+                          color: isSelected ? null : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? CustomColors()
+                                .backgroundAppkapi
+                                .withOpacity(0.6)
+                                : Colors.grey.shade200,
+                            width: isSelected ? 1.4 : 1,
                           ),
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () {
-                              setState(() {
-                                selectedIndex = index;
-                                articlesCommandeDetail = cmd["articles"];
-                              });
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Row(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  // Image commande
-                                  ClipRRect(
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                    child: Image.asset(
-                                      "assets/images/commande.jpg",
-                                      width: 52,
-                                      height: 52,
-                                      fit: BoxFit.cover,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(
+                                isSelected ? 0.12 : 0.04,
+                              ),
+                              blurRadius: isSelected ? 14 : 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () {
+                            setState(() {
+                              selectedIndex =
+                              isSelected ? -1 : index; // toggle
+                              articlesCommandeDetail = cmd["articles"];
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Timeline dot + line
+                                Column(
+                                  children: [
+                                    Container(
+                                      width: 10,
+                                      height: 10,
+                                      decoration: BoxDecoration(
+                                        color: statutColor,
+                                        shape: BoxShape.circle,
+                                      ),
                                     ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      width: 2,
+                                      height: 48,
+                                      color: Colors.grey.shade200,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(width: 10),
+
+                                // Image commande
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    "assets/images/commande.jpg",
+                                    width: 54,
+                                    height: 54,
+                                    fit: BoxFit.cover,
                                   ),
-                                  const SizedBox(width: 12),
+                                ),
+                                const SizedBox(width: 12),
 
-                                  // Infos
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                "Ref. ${cmd["reference"]}",
-                                                style: const TextStyle(
-                                                  fontWeight:
-                                                  FontWeight.w700,
-                                                  fontSize: 14,
-                                                ),
-                                                overflow:
-                                                TextOverflow.ellipsis,
+                                // Infos
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              "Ref. ${cmd["reference"]}",
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 14,
                                               ),
+                                              overflow: TextOverflow.ellipsis,
                                             ),
-                                            const SizedBox(width: 6),
-                                            Container(
-                                              padding:
-                                              const EdgeInsets
-                                                  .symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: statutColor
-                                                    .withOpacity(0.12),
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                  20,
-                                                ),
-                                              ),
-                                              child: Row(
-                                                mainAxisSize:
-                                                MainAxisSize.min,
-                                                children: [
-                                                  Icon(
-                                                    statutIcon,
-                                                    color: statutColor,
-                                                    size: 14,
-                                                  ),
-                                                  const SizedBox(
-                                                      width: 4),
-                                                  Text(
-                                                    statutTexte,
-                                                    style: TextStyle(
-                                                      color: statutColor,
-                                                      fontSize: 11,
-                                                      fontWeight:
-                                                      FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
                                             ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(height: 8),
-
-                                        buildInfoRow(
-                                          label: "Frais livraison",
-                                          value:
-                                          NumberFormat.currency(
-                                            locale: 'eu',
-                                            decimalDigits: 0,
-                                            symbol: devise,
-                                          ).format(
-                                            cmd["fraisLivraison"],
-                                          ),
-                                        ),
-                                        buildInfoRow(
-                                          label: "Montant total",
-                                          value:
-                                          NumberFormat.currency(
-                                            locale: 'eu',
-                                            decimalDigits: 0,
-                                            symbol: devise,
-                                          ).format(
-                                            double.tryParse(
-                                              cmd["montantFinal"]
-                                                  .toString(),
-                                            ) ??
-                                                0,
-                                          ),
-                                        ),
-                                        if (cmd["adresseLivraison"] !=
-                                            null)
-                                          buildInfoRow(
-                                            label: "Adresse",
-                                            value: cmd["adresseLivraison"]
-                                                .toString(),
-                                          ),
-                                        buildInfoRow(
-                                          label: "Date",
-                                          value: cmd["date"].toString(),
-                                        ),
-
-                                        const SizedBox(height: 8),
-
-                                        Row(
-                                          mainAxisAlignment:
-                                          MainAxisAlignment
-                                              .spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Détails",
-                                              style: TextStyle(
-                                                color:
-                                                Colors.grey.shade600,
-                                                fontSize: 12,
-                                              ),
+                                            decoration: BoxDecoration(
+                                              color: statutColor
+                                                  .withOpacity(0.12),
+                                              borderRadius:
+                                              BorderRadius.circular(20),
                                             ),
-                                            Row(
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                Text(
-                                                  "Voir plus",
-                                                  style: TextStyle(
-                                                    color: CustomColors()
-                                                        .backgroundAppkapi,
-                                                    fontWeight:
-                                                    FontWeight.w600,
-                                                    fontSize: 13,
-                                                  ),
+                                                Icon(
+                                                  statutIcon,
+                                                  color: statutColor,
+                                                  size: 14,
                                                 ),
                                                 const SizedBox(width: 4),
-                                                Icon(
-                                                  isSelected
-                                                      ? Icons
-                                                      .keyboard_arrow_up_rounded
-                                                      : Icons
-                                                      .keyboard_arrow_down_rounded,
-                                                  color: CustomColors()
-                                                      .backgroundAppkapi,
-                                                  size: 18,
+                                                Text(
+                                                  statutTexte,
+                                                  style: TextStyle(
+                                                    color: statutColor,
+                                                    fontSize: 11,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // ===== Détails articles =====
-                        if (isSelected)
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              left: 4,
-                              right: 4,
-                              bottom: 6,
-                            ),
-                            child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 6),
-                                const Text(
-                                  "Articles de la commande",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                ...List.generate(
-                                  articlesCommandeDetail.length,
-                                      (a) {
-                                    final article =
-                                    articlesCommandeDetail[a];
-
-                                    return Card(
-                                      elevation: 2,
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 4,
+                                          ),
+                                        ],
                                       ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(12),
-                                      ),
-                                      child: Padding(
-                                        padding:
-                                        const EdgeInsets.all(10),
-                                        child: Row(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                              BorderRadius.circular(
-                                                  10),
-                                              child:
-                                              CachedNetworkImage(
-                                                imageUrl:
-                                                article["imageUrl"],
-                                                width: 60,
-                                                height: 60,
-                                                fit: BoxFit.cover,
-                                                placeholder: (_, __) =>
-                                                const SizedBox(
-                                                  width: 24,
-                                                  height: 24,
-                                                  child:
-                                                  CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                  ),
-                                                ),
-                                                errorWidget:
-                                                    (_, __, ___) =>
-                                                const Icon(
-                                                  Icons.image_not_supported,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                CrossAxisAlignment
-                                                    .start,
-                                                children: [
-                                                  buildInfoRow(
-                                                    label: "Prix U",
-                                                    value: NumberFormat
-                                                        .currency(
-                                                      locale: 'eu',
-                                                      decimalDigits: 0,
-                                                      symbol: devise,
-                                                    ).format(
-                                                      double.tryParse(
-                                                        article["prixUnitaire"]
-                                                            .toString(),
-                                                      ) ??
-                                                          0,
-                                                    ),
-                                                  ),
-                                                  buildInfoRow(
-                                                    label: article["vcCouleur"]
-                                                        .toString()
-                                                        .isNumericOnly
-                                                        ? "Pointure"
-                                                        : "Taille",
-                                                    value: article[
-                                                    "vcTaille"],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
+
+                                      const SizedBox(height: 6),
+
+                                      buildInfoRow(
+                                        label: "Frais livraison",
+                                        value: NumberFormat.currency(
+                                          locale: 'eu',
+                                          decimalDigits: 0,
+                                          symbol: devise,
+                                        ).format(
+                                          cmd["fraisLivraison"],
                                         ),
                                       ),
-                                    );
-                                  },
+                                      buildInfoRow(
+                                        label: "Montant total",
+                                        value: NumberFormat.currency(
+                                          locale: 'eu',
+                                          decimalDigits: 0,
+                                          symbol: devise,
+                                        ).format(
+                                          double.tryParse(
+                                            cmd["montantFinal"]
+                                                .toString(),
+                                          ) ??
+                                              0,
+                                        ),
+                                      ),
+                                      if (cmd["adresseLivraison"] != null)
+                                        buildInfoRow(
+                                          label: "Adresse",
+                                          value: cmd["adresseLivraison"]
+                                              .toString(),
+                                        ),
+                                      buildInfoRow(
+                                        label: "Date",
+                                        value: cmd["date"].toString(),
+                                      ),
+
+                                      const SizedBox(height: 8),
+
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Détails",
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                isSelected
+                                                    ? "Masquer"
+                                                    : "Voir plus",
+                                                style: TextStyle(
+                                                  color: CustomColors()
+                                                      .backgroundAppkapi,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 13,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Icon(
+                                                isSelected
+                                                    ? Icons
+                                                    .keyboard_arrow_up_rounded
+                                                    : Icons
+                                                    .keyboard_arrow_down_rounded,
+                                                color: CustomColors()
+                                                    .backgroundAppkapi,
+                                                size: 18,
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                      ],
-                    );
-                  }),
-                ),
+                        ),
+                      ),
+
+                      // ===== Détails articles =====
+                      if (isSelected)
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 4,
+                            right: 4,
+                            top: 4,
+                            bottom: 2,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 4),
+                              const Text(
+                                "Articles de la commande",
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              ...List.generate(
+                                articlesCommandeDetail.length,
+                                    (a) {
+                                  final article = articlesCommandeDetail[a];
+
+                                  return Card(
+                                    elevation: 1.5,
+                                    margin:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(10),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                            child: CachedNetworkImage(
+                                              imageUrl: article["imageUrl"],
+                                              width: 60,
+                                              height: 60,
+                                              fit: BoxFit.cover,
+                                              placeholder: (_, __) =>
+                                              const SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child:
+                                                CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              ),
+                                              errorWidget: (_, __, ___) =>
+                                              const Icon(
+                                                Icons.image_not_supported,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  article["nom"] ??
+                                                      "Article",
+                                                  maxLines: 2,
+                                                  overflow:
+                                                  TextOverflow.ellipsis,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                buildInfoRow(
+                                                  label: "Prix U",
+                                                  value:
+                                                  NumberFormat.currency(
+                                                    locale: 'eu',
+                                                    decimalDigits: 0,
+                                                    symbol: devise,
+                                                  ).format(
+                                                    double.tryParse(
+                                                      article["prixUnitaire"]
+                                                          .toString(),
+                                                    ) ??
+                                                        0,
+                                                  ),
+                                                ),
+                                                buildInfoRow(
+                                                  label: article["vcCouleur"]
+                                                      .toString()
+                                                      .isNumericOnly
+                                                      ? "Pointure"
+                                                      : "Taille",
+                                                  value:
+                                                  article["vcTaille"] ??
+                                                      "",
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
         ),
+
       ],
     );
   }

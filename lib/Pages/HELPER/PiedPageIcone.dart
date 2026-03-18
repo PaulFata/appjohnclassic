@@ -5,6 +5,7 @@ import 'package:johnclassic/Pages/HistoriqueCommande/HistoriqueCommande.dart';
 import '../Connexion/Connexion.dart';
 import '../Dashboard/Dashboard.dart';
 import '../Services/Api.dart';
+import '../globals.dart';
 import '../res/CustomColors.dart';
 
 class PiedPageIcone extends StatefulWidget {
@@ -206,6 +207,7 @@ class _PiedPageIconeState extends State<PiedPageIcone> with SingleTickerProvider
         );
       }
           else{
+            print("$baseUrl&task=getHistoriqueCommandes&idUsersConnect=${dataResponse['id']}");
         Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => Historiquecommande()));
       }
         // Action catégories (tu peux modifier ici)
