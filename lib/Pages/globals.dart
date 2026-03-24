@@ -33,6 +33,7 @@ late BuildContext scaffoldContext;
 double montantTotalPanier=0;
 var mesArticles=[];
 var modePaiement;
+var motdepasseuser;
 var mesArticlesFiltrer= [];
 var dataPub;
 var listeCategorie;

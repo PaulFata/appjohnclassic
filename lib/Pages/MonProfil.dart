@@ -610,13 +610,7 @@ class _MonProfilState extends State<MonProfil> {
         EasyLoading.show(status: 'Suppresion en cours...');
 
         try {
-
-          EasyLoading.dismiss();
-
-          // Naviguer vers la page de connexion
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => Accueil()),
-          );
+          deletecompte(idUser: dataResponse['id'],password: motdepasseuser);
         } catch (e) {
           EasyLoading.dismiss();
           if (kDebugMode) {
@@ -677,6 +671,60 @@ class _MonProfilState extends State<MonProfil> {
       builder: (BuildContext context) => alert,
     );
   }
+
+  deletecompte({required idUser,required password}) async {
+    try{
+      http.Response response;
+      response = await http.get(Uri.parse("https://api.johnclassic.com/api/client?interfaceid=JOHNCLASSIC&secret=@cash!JONH2Q@/2024@!&task=deleteAccount&idUsersconect=$idUser&password=$password")
+      );
+      print("https://api.johnclassic.com/api/client?interfaceid=JOHNCLASSIC&secret=@cash!JONH2Q@/2024@!&task=deleteAccount&idUsersconect=$idUser&password=$password");
+      var jsonResponse = json.decode(response.body);
+
+      if (jsonResponse["status"] == 200) {
+        print("https://api.johnclassic.com/api/client?interfaceid=JOHNCLASSIC&secret=@cash!JONH2Q@/2024@!&task=deleteAccount&idUsersconect=$idUser&password=$password");
+        EasyLoading.dismiss();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 20,
+            content: Text("Compte supprimé avec succès"),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+        dataResponse=null;
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => Accueil()),
+        );
+      }
+      else {
+        EasyLoading.dismiss();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            elevation: 20,
+            content: Text(jsonResponse['message']),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 3),
+          ),
+        );
+
+
+      }
+    }
+        catch(e){
+          setState(() {
+            EasyLoading.dismiss();
+            SnackBar(
+              elevation: 20,
+              content: Text("Echec de connexion avec le serveur"),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 3),
+            );
+            // loader = false;
+          });
+        }
+  }
+
+
 }
 
 

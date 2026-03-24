@@ -1465,6 +1465,9 @@ class _ConnexionState extends State<Connexion> {
           var jsonResponse = json.decode(response.body);
 
           if (jsonResponse["status"] == 200) {
+           setState(() {
+             motdepasseuser=codePin;
+           });
             dataResponse = jsonResponse["data"];
 
             SharedPreferences prefs = await SharedPreferences.getInstance();
