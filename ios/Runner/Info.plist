@@ -68,9 +68,12 @@
     <key>NSBiometricsUsageDescription</key>
     <string>L’authentification biométrique protège vos données personnelles.</string>
 
-    <!-- LOCATION (UNIQUEMENT EN UTILISATION) -->
+    <!-- LOCATION -->
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>La localisation est utilisée pour afficher l’adresse de livraison et les points de vente à proximité.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>La localisation peut être utilisée même en arrière-plan pour améliorer les services de l'application.</string>
 
 </dict>
 </plist>

@@ -1333,6 +1333,7 @@ class _ConnexionState extends State<Connexion> {
           return;
         } else {
           print('connected');
+          print("$baseUrl&task=addInscriptionClient&nom=$nom&prenom=$prenom&email=$mail&adresse=$adresse&&msisdn=$numero");
 
           http.Response response;
           response = await http.get(
