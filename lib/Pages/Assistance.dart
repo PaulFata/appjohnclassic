@@ -85,6 +85,20 @@ class _AssistanceState extends State<Assistance>{
     }
   }
 
+  _sendEmail() async {
+    final Uri emailUri = Uri(
+      scheme: 'mailto',
+      path: 'mohamedjohntoure@johnclassic.com',
+      query: 'subject=Support John Classic&body=Bonjour,',
+    );
+
+    if (await canLaunchUrl(emailUri)) {
+      await launchUrl(emailUri);
+    } else {
+      throw 'Impossible d\'ouvrir l\'application mail';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, constraints) {
@@ -373,7 +387,7 @@ class _AssistanceState extends State<Assistance>{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Par téléphone',style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text('Par téléphone/ mail',style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10,),
                   Container(
                     color: Colors.grey[300],
@@ -402,7 +416,23 @@ class _AssistanceState extends State<Assistance>{
                               )
                             ],
                           ),
-                        )
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                                onPressed:(){} ,
+                                icon: Icon(Icons.mail, size: 20, color: CustomColors().backgroundColorAll,)
+                            ),
+                            const SizedBox(width: 10,),
+                            Text(
+                              'mohamedjohntoure@johnclassic.com',
+                              style: TextStyle(
+                                  color: CustomColors().backgroundColorAll
+                              ),
+                            )
+                          ],
+                        ),
                       ],
                     ),
                   ),

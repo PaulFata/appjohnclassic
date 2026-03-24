@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,6 +13,7 @@ import 'package:flutter/material.dart' hide ModalBottomSheetRoute;
 import 'package:http/http.dart' as http;
 import 'package:johnclassic/Pages/res/CustomColors.dart';
 
+import 'Accueil.dart';
 import 'Dashboard/Dashboard.dart';
 import 'HELPER/NetworkCheck.dart';
 import 'HELPER/PiedPageIcone.dart';
@@ -441,6 +444,20 @@ class _MonProfilState extends State<MonProfil> {
                             ),
                           ),
                         ),
+                      ),
+                      const SizedBox(height: 20,),
+                      InkWell(
+                        onTap: (){
+                          showAlertDialogSuppresionCompte(context);
+                        },
+                        child: Container(
+                          height: 50,
+                          width: MediaQuery.of(context).size.width*0.8,
+                          color: Colors.red,
+                          child: const Center(
+                            child: Text("Supprimer mon compte",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                          ),
+                        ),
                       )
                     ],
                   ),
@@ -557,6 +574,108 @@ class _MonProfilState extends State<MonProfil> {
         MaterialPageRoute(builder: (context) => Dashboard()),
       );
     });
+  }
+
+  Future<void> showAlertDialogSuppresionCompte(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    Widget cancelButton = TextButton(
+      style: TextButton.styleFrom(
+        foregroundColor: Colors.black,
+        textStyle: const TextStyle(fontWeight: FontWeight.w600),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      ),
+      onPressed: () => Navigator.of(context).pop(),
+      child: const Text("Annuler"),
+    );
+
+    Widget continueButton = ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.redAccent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        elevation: 4,
+        shadowColor: Colors.redAccent.withOpacity(0.4),
+        textStyle: const TextStyle(fontWeight: FontWeight.bold,color: Colors.black),
+      ),
+      onPressed: () async {
+        Navigator.of(context).pop(); // Close dialog first
+        SharedPreferences prefs =
+        await SharedPreferences.getInstance();
+
+        await prefs.remove("userData");
+        EasyLoading.instance
+          ..dismissOnTap = true
+          ..userInteractions = false;
+        EasyLoading.show(status: 'Suppresion en cours...');
+
+        try {
+
+          EasyLoading.dismiss();
+
+          // Naviguer vers la page de connexion
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => Accueil()),
+          );
+        } catch (e) {
+          EasyLoading.dismiss();
+          if (kDebugMode) {
+            print("Erreur lors de la suppression : $e");
+          }
+          // Optionnel : afficher une erreur utilisateur
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Erreur lors de la suppression.")),
+          );
+        }
+      },
+      child:  Text("Suppression",style:TextStyle(color: Colors.white),),
+    );
+
+    Widget alert;
+
+    if (Platform.isAndroid) {
+      alert = AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          "Suppression",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text("Êtes-vous sûr de vouloir supprimer votre compte  ?"),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        actions: [cancelButton, continueButton],
+      );
+    } else {
+      alert = CupertinoAlertDialog(
+        title: const Text(
+          "Suppression",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Padding(
+          padding: EdgeInsets.only(top: 8),
+          child: Text("Êtes-vous sûr de vouloir supprimer votre compte"),
+        ),
+        actions: [
+          CupertinoDialogAction(
+            child: cancelButton,
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            child: continueButton,
+            onPressed: () async {
+              Navigator.of(context).pop();
+              // même logique que ci-dessus, ou extraire dans une fonction commune
+            },
+          ),
+        ],
+      );
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) => alert,
+    );
   }
 }
 

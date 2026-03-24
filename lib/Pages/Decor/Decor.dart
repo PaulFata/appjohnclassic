@@ -75,12 +75,40 @@ class _DecorState extends State<Decor> with SingleTickerProviderStateMixin {
               ],
             ),
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: () => loadingPanier(context),
+              onPressed: (){
+                if (nombreArticlePanier.toString() == "0") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      elevation: 10,
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.all(12),
+                      content: Row(
+                        children: const [
+                          Icon(Icons.shopping_bag_outlined, color: Colors.white),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              "Votre panier est vide 🫣",
+                              style: TextStyle(fontSize: 13),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                } else {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => Monpanier()),
+                  );
+                }
+              },
               backgroundColor: CustomColors().backgroundAppkapi,
-              icon: const Icon(Icons.shopping_bag_rounded),
+              icon:  Icon(Icons.shopping_cart,color: Colors.white,),
               label: const Text(
                 "Voir le panier",
-                style: TextStyle(fontWeight: FontWeight.w600),
+                style: TextStyle(fontWeight: FontWeight.w600,color: Colors.white),
               ),
             ),
           ),
