@@ -13,7 +13,7 @@ import 'package:johnclassic/Pages/Panier/MonPanier.dart';
 import 'package:johnclassic/Pages/Vetements/Vetement.dart';
 import 'package:pushy_flutter/pushy_flutter.dart';
 import 'package:shimmer/shimmer.dart';
-
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import '../Accueil.dart';
@@ -466,7 +466,10 @@ class _DashboardState extends State<Dashboard> with TickerProviderStateMixin, Ro
                     Expanded(
                       child: Utils().animationContentTop(
                         context: context,
-                        child: body(constraints)
+                        child: Skeletonizer(
+                          enabled: false,
+                          child: body(constraints),
+                        ),
                       ),
                     )
                   ],
