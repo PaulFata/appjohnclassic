@@ -1431,7 +1431,21 @@ class _ConnexionState extends State<Connexion> {
       codePin: passwordController.text,
     );
   }
+  void showMessage(BuildContext context, String message,
+      {bool isError = true}) {
+    final messenger =
+    ScaffoldMessenger.of(Navigator.of(context).context);
 
+    messenger.hideCurrentSnackBar();
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
   _login(BuildContext context, {required numero, required codePin}) async {
     try {
       networkCheck.checkInternet((isNetworkPresent) async {
@@ -1440,14 +1454,7 @@ class _ConnexionState extends State<Connexion> {
             if (Navigator.canPop(context)) {
               Navigator.of(context).pop(); // Fermer le dialogue
             }
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                elevation: 20,
-                content: Text("Echec de connexion à internet"),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ),
-            );
+            showMessage(context, "Echec de connexion à internet");
           });
 
           return;
@@ -1512,14 +1519,7 @@ class _ConnexionState extends State<Connexion> {
                 Navigator.of(context).pop(); // Fermer le dialogue
               }
               // Naviguer vers Dashboard
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  elevation: 20,
-                  content: Text(jsonResponse["message"]),
-                  backgroundColor: Colors.red,
-                  duration: Duration(seconds: 3),
-                ),
-              );
+              showMessage(context, jsonResponse["message"]);
             });
           }
         }
@@ -1530,14 +1530,9 @@ class _ConnexionState extends State<Connexion> {
           Navigator.of(context).pop(); // Fermer le dialogue
         }
         // Naviguer vers Dashboard
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 20,
-            content: Text("Echec de connexion avec le serveur"),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
+        showMessage(context, "Echec de connexion avec le serveur");
+
+
       });
     }
   }
@@ -1571,14 +1566,8 @@ class _ConnexionState extends State<Connexion> {
             if (Navigator.canPop(context)) {
               Navigator.of(context).pop(); // Fermer le dialogue
             }
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                elevation: 20,
-                content: Text("Echec de connexion à internet"),
-                backgroundColor: Colors.red,
-                duration: Duration(seconds: 3),
-              ),
-            );
+            showMessage(context, "Echec de connexion à internet");
+
           });
 
           return;
@@ -1595,16 +1584,8 @@ class _ConnexionState extends State<Connexion> {
               if (Navigator.canPop(context)) {
                 Navigator.of(context).pop(); // Fermer le dialogue
               }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  elevation: 20,
-                  content: Text(
-                    "Mot de passe initialisé avec succès. veuillez consulter vos SMS ",
-                  ),
-                  backgroundColor: Colors.green,
-                  duration: Duration(seconds: 3),
-                ),
-              );
+
+              showMessage(context, "Mot de passe initialisé avec succès. veuillez consulter vos SMS");
               setState(() {});
             });
           } else {
@@ -1613,14 +1594,8 @@ class _ConnexionState extends State<Connexion> {
                 Navigator.of(context).pop(); // Fermer le dialogue
               }
               // Naviguer vers Dashboard
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  elevation: 20,
-                  content: Text(jsonResponse["message"]),
-                  backgroundColor: Colors.red,
-                  duration: Duration(seconds: 3),
-                ),
-              );
+              showMessage(context, jsonResponse["message"]);
+
             });
           }
         }
@@ -1631,14 +1606,8 @@ class _ConnexionState extends State<Connexion> {
           Navigator.of(context).pop(); // Fermer le dialogue
         }
         // Naviguer vers Dashboard
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            elevation: 20,
-            content: Text("Echec de connexion avec le serveur"),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
+        showMessage(context, "Echec de connexion avec le serveur");
+
       });
     }
   }
@@ -1651,9 +1620,8 @@ class _ConnexionState extends State<Connexion> {
       final bool canCheck = await auth.canCheckBiometrics;
 
       if (!isSupported || !canCheck) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Biométrie non disponible")),
-        );
+        showMessage(context, "Biométrie non disponible");
+
         return;
       }
 
@@ -1667,9 +1635,8 @@ class _ConnexionState extends State<Connexion> {
       );
 
       if (!didAuthenticate) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Authentification annulée")),
-        );
+        showMessage(context, "Authentification annulée");
+
         return;
       }
 
